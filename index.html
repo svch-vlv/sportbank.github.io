@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>СпортБанк (Шуточный)</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin: 0 10px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        section {
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .auth-buttons {
+            margin-top: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>СпортБанк</h1>
+        <nav>
+            <ul>
+                <li><a href="#">Главная</a></li>
+                <li><a href="#">Услуги</a></li>
+                <li><a href="#">О нас</a></li>
+                <li><a href="#">Контакты</a></li>
+            </ul>
+        </nav>
+        <div class="auth-buttons">
+            <button id="login-button">Войти</button>
+            <button id="register-button">Зарегистрироваться</button>
+        </div>
+    </header>
+
+    <main>
+        <section id="login-form" class="hidden">
+            <h2>Вход</h2>
+            <form id="login-form-actual">
+                <label for="login-username">Имя пользователя:</label>
+                <input type="text" id="login-username" name="login-username" required><br><br>
+
+                <label for="login-password">Пароль:</label>
+                <input type="password" id="login-password" name="login-password" required><br><br>
+
+                <button type="submit">Войти</button>
+            </form>
+        </section>
+
+        <section id="register-form" class="hidden">
+            <h2>Регистрация</h2>
+            <form id="register-form-actual">
+                <label for="register-username">Имя пользователя:</label>
+                <input type="text" id="register-username" name="register-username" required><br><br>
+
+                <label for="register-password">Пароль:</label>
+                <input type="password" id="register-password" name="register-password" required><br><br>
+
+                <button type="submit">Зарегистрироваться</button>
+            </form>
+        </section>
+
+        <section id="dashboard" class="hidden">
+            <h2>Добро пожаловать, <span id="username-display"></span>!</h2>
+            <p>Ваш баланс: <span id="balance-display"></span></p>
+            <button id="logout-button">Выйти</button>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2023 СпортБанк. Все права защищены.</p>
+    </footer>
+
+    <script>
+        const loginButton = document.getElementById('login-button');
+        const registerButton = document.getElementById('register-button');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const dashboard = document.getElementById('dashboard');
+        const logoutButton = document.getElementById('logout-button');
+        const usernameDisplay = document.getElementById('username-display');
+        const balanceDisplay = document.getElementById('balance-display');
+        const loginFormActual = document.getElementById('login-form-actual');
+        const registerFormActual = document.getElementById('register-form-actual');
+
+        let users = []; // In-memory storage for users
+
+        // Функции для показа/скрытия форм и панели управления
+        function showDashboard(username, balance) {
+            usernameDisplay.textContent = username;
+            balanceDisplay.textContent = balance;
+            loginForm.classList.add('hidden');
+            registerForm.classList.add('hidden');
+            dashboard.classList.remove('hidden');
+        }
+
+        function showLoginForm() {
+            loginForm.classList.remove('hidden');
+            registerForm.classList.add('hidden');
+            dashboard.classList.add('hidden');
+        }
+
+        function showRegisterForm() {
+            registerForm.classList.remove('hidden');
+            loginForm.classList.add('hidden');
+            dashboard.classList.add('hidden');
+        }
+
+        function showAuthButtons() {
+            loginForm.classList.add('hidden');
+            registerForm.classList.add('hidden');
+            dashboard.classList.add('hidden');
+        }
+
+        // Обработчики событий для кнопок
+        loginButton.addEventListener('click', showLoginForm);
+        registerButton.addEventListener('click', showRegisterForm);
+        logoutButton.addEventListener('click', showAuthButtons);
+
+        // Обработчик отправки формы входа
+        loginFormActual.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+
+            const user = users.find(u => u.username === username && u.password === password);
+
+            if (user) {
+                showDashboard(user.username, user.balance);
+            } else {
+                alert('Неверное имя пользователя или пароль.');
+            }
+        });
+
+        // Обработчик отправки формы регистрации
+        registerFormActual.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const username = document.getElementById('register-username').value;
+            const password = document.getElementById('register-password').value;
+
+            if (users.find(u => u.username === username)) {
+                alert('Имя пользователя уже существует.');
+                return;
+            }
+
+            const newUser = {
+                username: username,
+                password: password,
+                balance: 1000
+            };
+
+            users.push(newUser);
+            showDashboard(newUser.username, newUser.balance);
+            alert('Регистрация прошла успешно!');
+        });
+    </script>
+</body>
+</html>
